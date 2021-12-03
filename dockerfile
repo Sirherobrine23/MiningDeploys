@@ -15,10 +15,11 @@ RUN cd /tmp/ &&  wget --no-check-certificate https://github.com/ethereum-mining/
 
 # Minergate
 # minergate-cli --user "$Email" --bcn $(($(nproc) * 2))
-RUN wget --no-check-certificate "https://minergate.com/download/xfast-ubuntu-cli/1.2" -O Minergate.deb && dpkg -i Minergate.deb && rm -rfv Minergate.deb
+RUN wget --no-check-certificate "https://minergate.com/download/xfast-ubuntu-cli/1.5" -O Minergate.deb && dpkg -i Minergate.deb || (apt install -yf && dpkg -i Minergate.deb); rm -rfv Minergate.deb
 
 ENV Mining="xmr" Email="srherobrine20@gmail.com"
-# PATH=/Minings/xmrig:/Minings/ethminer:$PATH
-COPY ./start.sh /bin/start_mining.sh
-RUN chmod a+x /bin/start_mining.sh
-ENTRYPOINT [ "/bin/start_mining.sh" ]
+ENV PATH=/Minings/xmrig:/Minings/ethminer:$PATH
+RUN apt install -y dos2unix
+COPY ./*.sh /bin/
+RUN dos2unix /bin/*.sh && chmod a+x -v /bin/*.sh
+ENTRYPOINT [ "bash", "/bin/start.sh" ]
